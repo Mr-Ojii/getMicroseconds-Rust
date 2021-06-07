@@ -1,0 +1,13 @@
+[package]
+name = "getMicroseconds"
+version = "1.0.0"
+authors = ["Mr-Ojii <okaschan@gmail.com>"]
+edition = "2018"
+license-file = "LICENSE.txt"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
