@@ -36,6 +36,9 @@ jobs:
           - x86_64-unknown-linux-gnu
           - x86_64-pc-windows-gnu
           - x86_64-apple-darwin
+          - i686-unknown-linux-gnu
+          - i686-pc-windows-gnu
+          - i686-apple-darwin
         include:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
@@ -43,15 +46,26 @@ jobs:
             os: ubuntu-latest
           - target: x86_64-apple-darwin
             os: macos-latest
+          - target: i686-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: i686-pc-windows-gnu
+            os: ubuntu-latest
+          - target: i686-apple-darwin
+            os: macos-latest
           
     runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
-    - name: install Cross
+    - name: Install Cross
       run: cargo install cross
+
+    - name: Install mingw-w64-i686-gcc
+      if: ${{ matrix.target }} == "i686-pc-windows-gnu"
+      run: sudo apt install mingw-w64
+      
     - name: Build
-      run: cross build --target ${{ matrix.target }}
+      run: cross build --release --target ${{ matrix.target }}
       
     - name: Create Zip
       run: |
