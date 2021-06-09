@@ -1,0 +1,77 @@
+name: Rust
+
+on: 
+  push:
+    branches: 
+      - master
+    tags:
+      - "Ver.*"
+
+env:
+  CARGO_TERM_COLOR: always
+  
+jobs:
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@v1
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+  build:
+    needs: create_release
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-pc-windows-gnu
+          - x86_64-apple-darwin
+          - i686-unknown-linux-gnu
+          - i686-pc-windows-gnu
+          - i686-apple-darwin
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-pc-windows-gnu
+            os: ubuntu-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: i686-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: i686-pc-windows-gnu
+            os: ubuntu-latest
+          - target: i686-apple-darwin
+            os: macos-latest
+          
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install Cross
+      run: cargo install cross
+    - name: Build
+      run: cross build --target ${{ matrix.target }}
+      
+    - name: Create Zip
+      run: |
+        zip getMicroseconds-Release.zip -r target
+      
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create_release.outputs.upload_url }}
+        asset_path: ./getMicroseconds-Release.zip
+        asset_name: getMicroseconds-${{matrix.target}}-${{ github.ref }}.zip
+        asset_content_type: application/zip
