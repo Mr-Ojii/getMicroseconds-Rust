@@ -60,7 +60,10 @@ jobs:
     #https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#functions
     - name: Install mingw-w64-i686-gcc
       if: (contains(matrix.target, 'i686-pc-windows-gnu')) == true
-      run: sudo apt install mingw-w64
+      run: |
+        rustup toolchain install stable-i686-pc-windows-gnu stable-x86_64-pc-windows-gnu
+        rustup target add i686-pc-windows-gnu x86_64-pc-windows-gnu
+        sudo apt install mingw-w64
       
     - name: Build
       run: cross build --release --verbose --target ${{ matrix.target }}
