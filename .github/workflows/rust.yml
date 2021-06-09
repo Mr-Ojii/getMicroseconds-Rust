@@ -38,7 +38,6 @@ jobs:
           - x86_64-apple-darwin
           - i686-unknown-linux-gnu
           - i686-pc-windows-gnu
-          - i686-apple-darwin
         include:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
@@ -50,8 +49,6 @@ jobs:
             os: ubuntu-latest
           - target: i686-pc-windows-gnu
             os: ubuntu-latest
-          - target: i686-apple-darwin
-            os: macos-latest
           
     runs-on: ${{ matrix.os }}
 
@@ -66,7 +63,7 @@ jobs:
       run: sudo apt install mingw-w64
       
     - name: Build
-      run: cross build --release --target ${{ matrix.target }}
+      run: cross build --release --verbose --target ${{ matrix.target }}
       
     - name: Create Zip
       run: |
